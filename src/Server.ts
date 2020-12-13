@@ -34,7 +34,7 @@ export default class Server {
       });
       this.app.use(express.json());
       this.setRoute();
-      this.server = this.app.listen(port, () => {
+      this.server = this.app.listen(port, '127.0.0.1', () => {
         console.log(`Server opened. port: ${port}`);
       });
     });
