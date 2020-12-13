@@ -2,6 +2,7 @@ import http from 'http';
 import express from 'express';
 import DA from './DA';
 import escape from './escape';
+import Filter from './Filter';
 
 interface CommentRequest{
   aid: string
@@ -17,7 +18,10 @@ export default class Server {
 
   private da: DA
 
+  private filter: Filter
+
   constructor(port:number) {
+    this.filter = new Filter();
     this.da = new DA();
     this.da.open().then(() => {
       this.app = express();
@@ -48,21 +52,41 @@ export default class Server {
               text: escape.html(v.text),
               time: v.time,
             }));
-            res.send(JSON.stringify(escaped));
+            res.json(escaped);
             console.log(`get '${req.query.aid}`);
           },
         );
       })
       .post((req, res) => {
         const cmtReq = req.body as CommentRequest;
+        if (!this.filter.checkText(cmtReq.text)) {
+          res.status(500);
+          res.json({
+            msg: '올바른 내용을 입력하세요.',
+          });
+          return;
+        }
+
+        const ip = req.connection.remoteAddress || req.headers['x-forwarded-for'] as string;
+        if (!this.filter.checkIP(ip)) {
+          res.status(500);
+          res.json({
+            msg: '잠시 후 다시 시도하세요.',
+          });
+          return;
+        }
+
+        cmtReq.name = this.filter.filterName(cmtReq.name);
+
         this.da.insertComment(cmtReq).then((v) => {
           if (v) {
             res.status(200);
+            res.json({ msg: '댓글을 등록했습니다.' });
             console.log(`post ${cmtReq.aid} / ${cmtReq.name}: ${cmtReq.passwd}\n${cmtReq.text}`);
           } else {
             res.status(400);
+            res.json({ msg: '댓글을 등록하지 못했습니다.' });
           }
-          res.send('.');
         });
       })
       .delete((req, res) => {
@@ -70,11 +94,13 @@ export default class Server {
           req.query.passwd as string).then((v) => {
           if (v) {
             res.status(200);
+            res.json({ msg: '댓글을 삭제했습니다.' });
+
             console.log(`delete ${req.query.id}`);
           } else {
             res.status(400);
+            res.json({ msg: '댓글을 삭제하지 못했습니다.' });
           }
-          res.send('.');
         });
       });
   }
