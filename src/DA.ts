@@ -7,6 +7,14 @@ interface Comment{
   text: string
 }
 
+interface CommentNP{
+  id: number
+  aid: string
+  name: string
+  text: string
+  time: number
+}
+
 export default class DA {
   db:sqlite3.Database | undefined
 
@@ -41,8 +49,8 @@ export default class DA {
     });
   }
 
-  selectCommentFrom(aid: string): Promise<Comment[]> {
-    return new Promise<Comment[]>((resolve) => {
+  selectCommentFrom(aid: string): Promise<CommentNP[]> {
+    return new Promise<CommentNP[]>((resolve) => {
       this.db?.all(
         `SELECT * FROM comments WHERE aid = '${aid}';`,
         (err, rows) => {
@@ -50,7 +58,13 @@ export default class DA {
             console.error(err);
             resolve([]);
           } else {
-            resolve(rows);
+            resolve(rows.map((v) => ({
+              aid: v.aid,
+              id: v.id,
+              name: v.name,
+              text: v.text,
+              time: v.time,
+            })));
           }
         },
       );
