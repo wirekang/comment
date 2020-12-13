@@ -8,11 +8,9 @@ function getByte(str:string):number {
 }
 
 export default class Filter {
-  private ips:Map<string, number>;
+  private ips:Map<string, boolean>;
 
-  ipLife = 10000;
-
-  ipMax = 1;
+  ipDelay = 10000;
 
   nameMin = 4;
 
@@ -23,23 +21,19 @@ export default class Filter {
   textMax = 500;
 
   constructor() {
-    this.ips = new Map<string, number>();
+    this.ips = new Map<string, boolean>();
   }
 
   checkIP(ip:string):boolean {
-    const count = this.ips.get(ip);
-    if (count) {
-      if (count < this.ipMax) {
-        this.ips.set(ip, count + 1);
-        setTimeout(() => {
-          this.ips.set(ip, count);
-        }, this.ipLife);
-        return true;
-      }
+    const recent = this.ips.get(ip);
+    if (recent) {
       console.log(`IP ${ip}`);
       return false;
     }
-    this.ips.set(ip, 1);
+    this.ips.set(ip, true);
+    setTimeout(() => {
+      this.ips.set(ip, false);
+    }, this.ipDelay);
     return true;
   }
 
