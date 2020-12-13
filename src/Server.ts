@@ -67,8 +67,8 @@ export default class Server {
           return;
         }
 
-        const ip = req.connection.remoteAddress || req.headers['x-forwarded-for'] as string;
-        if (!this.filter.checkIP(ip)) {
+        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        if (!this.filter.checkIP(ip as string)) {
           res.status(500);
           res.json({
             msg: '잠시 후 다시 시도하세요.',

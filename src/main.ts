@@ -1,10 +1,6 @@
 import Server from './Server';
 
-const flags = require('flags');
-
-flags.defineInteger('port', 443, 'port');
-flags.parse();
-const server = new Server(flags.get('port'));
+const server = new Server(8081);
 process.stdin.resume();
 
 function cleanup() {
