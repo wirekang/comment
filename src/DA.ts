@@ -1,4 +1,5 @@
-import sqlite3 = require('sqlite3');
+import sqlite3 from 'sqlite3';
+import escape from './escape';
 
 interface Comment{
   aid: string
@@ -34,7 +35,8 @@ export default class DA {
   insertComment(cmt: Comment): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
       const sql = 'INSERT INTO comments( aid,name,passwd,text,time) VALUES('
-        + `'${cmt.aid}','${cmt.name}','${cmt.passwd}','${cmt.text}'`
+        + `'${escape.sql(cmt.aid)}','${escape.sql(cmt.name)}',`
+        + `'${escape.sql(cmt.passwd)}','${escape.sql(cmt.text)}'`
         + `, ${Date.now()});`;
       this.db?.run(sql,
         (err) => {
@@ -52,7 +54,7 @@ export default class DA {
   selectCommentFrom(aid: string): Promise<CommentNP[]> {
     return new Promise<CommentNP[]>((resolve) => {
       this.db?.all(
-        `SELECT * FROM comments WHERE aid = '${aid}';`,
+        `SELECT * FROM comments WHERE aid = '${escape.sql(aid)}';`,
         (err, rows) => {
           if (err) {
             console.error(err);
@@ -73,7 +75,7 @@ export default class DA {
 
   deleteComment(id:number, passwd: string): Promise<boolean> {
     return new Promise<boolean>((resolve) => {
-      const sql = `DELETE FROM comments WHERE id=${id} AND passwd='${passwd}'`;
+      const sql = `DELETE FROM comments WHERE id=${id} AND passwd='${escape.sql(passwd)}'`;
       this.db?.run(sql,
         function (err) {
           if (err) {

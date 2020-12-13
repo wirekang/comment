@@ -1,6 +1,7 @@
 import http from 'http';
 import express from 'express';
 import DA from './DA';
+import escape from './escape';
 
 interface CommentRequest{
   aid: string
@@ -40,7 +41,14 @@ export default class Server {
       .get((req, res) => {
         this.da.selectCommentFrom(req.query.aid as string).then(
           (comments) => {
-            res.send(JSON.stringify(comments));
+            const escaped = comments.map((v) => ({
+              id: v.id,
+              aid: v.aid,
+              name: escape.html(v.name),
+              text: escape.html(v.text),
+              time: v.time,
+            }));
+            res.send(JSON.stringify(escaped));
             console.log(`get '${req.query.aid}`);
           },
         );
