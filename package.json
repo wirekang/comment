@@ -1,7 +1,7 @@
 {
   "scripts": {
     "start": "npx ts-node src/main.ts",
-    "dev": "nodemon --exec ts-node src/main.ts",
+    "dev": "nodemon --exec ts-node src/main.ts --port 8081",
     "build": "npx tsc"
   },
   "license": "MIT",
