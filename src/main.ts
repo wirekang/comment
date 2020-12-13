@@ -2,7 +2,7 @@ import Server from './Server';
 
 const flags = require('flags');
 
-flags.defineInteger('port', 80, 'port');
+flags.defineInteger('port', 443, 'port');
 flags.parse();
 const server = new Server(flags.get('port'));
 process.stdin.resume();
