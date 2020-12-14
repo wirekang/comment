@@ -6,8 +6,8 @@ export default {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/\\n/g, '<br>')
-      .replace(/\\"/g, '$quot;')
-      .replace(/\\'/g, '$apos;');
+      .replace(/\\"/g, '&quot;')
+      .replace(/\\'/g, '&apos;');
   },
   sql(str:string):string {
     return sqlstring.escape(str);
