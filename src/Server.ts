@@ -53,7 +53,6 @@ export default class Server {
               time: v.time,
             }));
             res.json(escaped);
-            console.log(`get '${req.query.aid}`);
           },
         );
       })
